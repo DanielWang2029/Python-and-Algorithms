@@ -12,7 +12,7 @@ Note that the classification of difficulty levels does not meant to be exact and
 ## How to Navigate
 If you are ***new*** to coding, I'd recommand starting with Numbers.py, String.py, the first part of List_Tuple_Set.py and Slicing.py in Intro. Try creating a new .py file on your own, write some basic codes (even if just copying and pasting), and run it to see the results. Also, try YouTube! It's the best starting place to learn almost anything legal.
 
-If you are ***familiar*** with another language and new to Python, I'd also recommand going through some basic stuffs in Intro first to get a sense of the grammer. Try understanding what each line of code is about and predict its output before running it. It will be a good refresher for coding basics. You'll be surprised how easy it is to write Python and how much you've forgot from CS 101.
+If you are ***familiar*** with another language and new to Python, I'd also recommand going through some basic stuffs in Intro first to get a sense of the grammer. Try understanding what each line of code is about and predict its output before running it. It will be a good refresher for coding basics. You'll be surprised how easy it is to write Python and how much you've forgoten from CS 101.
 
 If you are ***fluent*** at Python, try some of the harder topics in Intro and see if you've known them before. If so, move to Intermediate and I guarantee most people would find topics that they've never heard of before. Try them and think about where they could be used to improve your Python coding.
 
