@@ -38,8 +38,3 @@ for key, value in student.items():
 for item in student.items():
     print(item)
     print(type(item))
-
-# from another video
-d = {1: 100, 2: 200}
-# del d[3]  KeyError
-print(d)
