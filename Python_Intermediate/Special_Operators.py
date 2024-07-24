@@ -36,7 +36,8 @@ else:
 # we can also use := when the value is expensive to compute
 arr = [z := f(g(k(z))), z**2, z**3]
 
-# note that the scope for := is the currently scope (honors nonlocal/global declarations), except comprehensions
+# note that the scope for := is the currently scope (honors nonlocal/global declarations)
+# except in comprehensions where it actually binds the target with the outer scope
 # this means that variables defined in list comprehension exist outside the comprehension
 print(z)  # prints f(g(k(x))), not raising an exception
 
