@@ -38,3 +38,16 @@ for key, value in student.items():
 for item in student.items():
     print(item)
     print(type(item))
+
+
+# Dictionary comprehension
+d = {k:v for k, v in enumerate([1, 3, 5, 7, 9])}
+print(d)  # prints {0:1, 1:3, 2:5, 3:7, 4:9}
+
+# can also initialize using dict() with a iterables of iterables where each element has size of 2
+d = dict(((1, 2), (3, 4), (5, 6)))
+print(d)  # prints {1:2, 3:4, 5:6}
+
+# initialize using dict() and zip() with a key list and a value list
+d = dict(zip([0, 1, 2], [3, 4, 5]))
+print(d)  # prints {0:3, 1:4, 2:5}
