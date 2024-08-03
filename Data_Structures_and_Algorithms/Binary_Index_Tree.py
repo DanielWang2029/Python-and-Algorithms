@@ -1,6 +1,7 @@
 
 # Binary index trees, or Fenwick trees, are used to store frequencies and manipulating cumulative frequency
 
+
 # Consider the following problem: There are n boxes that undergo the following queries:
 # q1: add a marble to box i
 # q2: sum number of marbles from box i to box j
@@ -57,7 +58,7 @@
 # and we don't want to do anything with the value of node 7 or beyond as they have larger index than node 6.
 
 
-# For idea #3, lets take a look at the tree but this time using binary representation for the indexes:
+# For idea #3, let's take a look at the tree but this time using binary representation for the indexes:
 #                    [1000]
 #                  22+7+3+8=40
 #             /--------------------\
@@ -94,7 +95,58 @@
 # eliminating the need to build an actual tree with nodes.
 
 
-# Here's the implementation of the binary index tree:
+# Using the ideas above, we could write several function for our binary index tree:
+
+# To get a node's index using its path-corresponding binary representation:
+#     def _get_index(self, binary):
+#         return int((binary + '1').ljust(self._height, '0'), 2)
+
+# To get the path-corresponding binary representation of a node using index:
+#     def _get_binary(self, index):
+#         result = bin(index)[2:].rjust(self._height, '0')
+#         index = len(result) - 1
+#         while index >= 0 and result[index] == '0':
+#             index -= 1
+#         return result[0: index]
+
+# To get the cumulative sum from start to node:
+#     def get_cumulative_sum(self, index):
+#         binary = self._get_binary(index)
+#         result = self.tree[self._get_index(binary) - 1]
+#         while len(binary) > 0:
+#             if binary[-1] == '1':
+#                 result += self.tree[self._get_index(binary[:-1]) - 1]
+#             binary = binary[:-1]
+#         return result
+
+# Notice that we have to convert between numeric index and path-corresponding binary representation multiple times.
+# Is there a way to iterate through the tree using only its index in binary form (not path-corresponding)?
+# The answer is YES!
+
+# Observe that we don't have to go through every parent nodes to get the cumulative sum of a node.
+# We only need to visit the left parents, i.e. parents that are left of our node.
+# This is why we update only if the last bit for path-corresponding binary is '1', i.e. moving to parent's right child
+# Take the cumulative sum of node 11 for example (binary: 1011, path-corresponding binary: 101):
+# Since 101 ends with 1, we add the value of node 10 (binary: 1010, path corresponding binary: 10) to result.
+# The next bit in 101 is 0, so we don't add the value of node 12 (binary: 1100, path corresponding binary: 1).
+# Finally, the last bit in 101 is 1, so we add the value of node 8 (binary: 1000, path corresponding binary: N/A).
+
+# We can also apply the "ignore 0 rule" to the binary representation of the index:
+# Starting from the least significant bit, we change 1 into 0 one by one until we reach 0.
+# For 1011, we change the last 1 to 0 and get 1010. Then we change another 1 to 0 and get 1000. Finally, we'll reach 0.
+# So result = the value of the node itself (1011) + the value of its left parents (1010 and 1000).
+# Using the above method, we've successfully got rid of the path-corresponding binary representation!
+
+# The last piece of the puzzle is to derive a method for changing the last/rightmost 1 to 0 in bits operation.
+# We observe that for any number, num, that is not 0, we can write it in form of A1B,
+# where A is also a binary number and B are all zeros.
+# We also know that -num = (A1B)' + 1 = A'0B' + 1.
+# Since B is all zeros, B' is all ones, giving us -num = A'0B' + 1 = A'1B
+# Therefore changing the last/rightmost 1 to 0 could be done using:
+# num_new = num - (-num & num) = A1B - A'1B & A1B = A1B - 01B = A0B
+
+
+# With these, we could rewrite our get_cumulative_sum. Here's the final implementation of the binary index tree:
 class BinaryIndexTree:
 
     def __init__(self, arr):
@@ -103,21 +155,6 @@ class BinaryIndexTree:
         self.tree = [0 for _ in range((1 << self._height) - 1)]
         for i, v in enumerate(arr):
             self.increment_value(i + 1, v)
-
-    def _get_index(self, binary):
-        if (index := int((binary + '1').ljust(self._height, '0'), 2)) > self._length:
-            raise ValueError(f'Invalid binary input. '
-                             f'The converted index {index} is larger than tree size {self._length}')
-        return index
-
-    def _get_binary(self, index):
-        if index <= 0:
-            raise ValueError(f'{index} is not a valid index. Must be a positive integer.')
-        result = bin(index)[2:].rjust(self._height, '0')
-        index = len(result) - 1
-        while index >= 0 and result[index] == '0':
-            index -= 1
-        return result[0: index]
 
     def _get_height(self):
         if self._length <= 0:
@@ -139,19 +176,11 @@ class BinaryIndexTree:
         if index > self._length:
             raise ValueError(f'Cannot set value on index {index} for a binary index tree with size {self._length}.')
 
-        binary = self._get_binary(index)
-        self.tree[self._get_index(binary) - 1] += value
-        while len(binary) > 0:
-            # parent could have index outside/larger than self.length due to tree setup
-            try:
-                curr_index = self._get_index(binary[:-1]) - 1
-            except ValueError as err:
-                pass
-            else:
-                if binary[-1] == '0':
-                    self.tree[curr_index] += value
-            finally:
-                binary = binary[:-1]
+        # here we want to find all right parents to update instead of left, therefore slight changes have been made
+        binary = index
+        while binary <= self._length:
+            self.tree[binary - 1] += value
+            binary += -binary & binary  # A1B + (A'1B & A1B) = A1B + 1B = (A + 1)0B
 
     def get_cumulative_sum(self, index):
         if index <= 0:
@@ -159,12 +188,12 @@ class BinaryIndexTree:
         if index > self._length:
             raise ValueError(f'Cannot get sum on index {index} for a binary index tree with size {self._length}.')
 
-        binary = self._get_binary(index)
-        result = self.tree[self._get_index(binary) - 1]
-        while len(binary) > 0:
-            if binary[-1] == '1':
-                result += self.tree[self._get_index(binary[:-1]) - 1]
-            binary = binary[:-1]
+        # this is the algorithm describe earlier
+        binary = index
+        result = 0
+        while binary != 0:
+            result += self.tree[binary - 1]
+            binary -= -binary & binary  # A1B - (A'1B & A1B) = A1B - 1B = A0B
 
         return result
 
@@ -217,9 +246,6 @@ print(t)
 #     6           7           9          13
 #   /--\        /--\        /--\        /--\
 #  4     5    -1     3     6     8     9     6
-
-print([t._get_binary(i) for i in range(1, 16)])
-# prints ['000', '00', '001', '0', '010', '01', '011', '', '100', '10', '101', '1', '110', '11', '111']
 
 print(t.get_cumulative_sum(15))  # prints 80
 print(t.get_cumulative_sum(5))  # prints 21
