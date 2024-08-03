@@ -187,7 +187,8 @@ class Heap:
                 results.append(f'{self.heap[0]}')
                 break
 
-            elements = [str(x).rjust(number_length, '0' if leading_zero else ' ') for x in self.heap[(1 << level >> 1) - 1: (1 << level) - 1]]
+            elements = [str(x).rjust(number_length, '0' if leading_zero else ' ')
+                        for x in self.heap[(1 << level >> 1) - 1: (1 << level) - 1]]
             if level == height:
                 elements += [fill_empty_char * number_length for _ in range((1 << level) - len(self.heap) - 1)]
             results.append((fill_number_connect_char * number_filler_length).join(elements))
@@ -202,7 +203,9 @@ class Heap:
                     elif slashes[2 * i] == '/':
                         elements.append('/' + fill_slash_connect_char * slash_inside_filler_length + fill_empty_char)
                     else:
-                        elements.append(fill_empty_char + fill_slash_connect_char * slash_inside_filler_length + fill_empty_char)
+                        elements.append(fill_empty_char
+                                        + fill_slash_connect_char * slash_inside_filler_length
+                                        + fill_empty_char)
             else:
                 elements = ['/' + fill_slash_inside_char * slash_inside_filler_length + '\\'] * (1 << level >> 2)
             results.append((fill_slash_connect_char * slash_connect_filler_length).join(elements))
