@@ -1,4 +1,5 @@
 
+# https://www.topcoder.com/thrive/articles/Binary%20Indexed%20Trees
 # Binary index trees, or Fenwick trees, are used to store frequencies and manipulating cumulative frequency
 
 
@@ -176,7 +177,7 @@ class BinaryIndexTree:
         if index > self._length:
             raise ValueError(f'Cannot set value on index {index} for a binary index tree with size {self._length}.')
 
-        # here we want to find all right parents to update instead of left, therefore slight changes have been made
+        # here we want to find all right parents to update instead of left, therefore algorithm has been inverted
         binary = index
         while binary <= self._length:
             self.tree[binary - 1] += value
@@ -250,3 +251,14 @@ print(t)
 print(t.get_cumulative_sum(15))  # prints 80
 print(t.get_cumulative_sum(5))  # prints 21
 print(t.get_cumulative_sum(9) - t.get_cumulative_sum(7))  # prints n8.value + n9.value = 8 + 6 = 14
+
+
+# The input/value dimension could be more than 1, in which case we'll build up NESTED binary index trees.
+# Let's say boxes are now arranged in a square of n x m,
+# and we want to count the total number of marbles in all squares within a range defined by (0, 0) and (a, b).
+
+# For this, our BIT is set up in a way that the size of the tree is n and each node is another BIT of size m,
+# where tree[i][j] represents the number of marbles in boxes whose row and column indexes are in the subtree of i and j.
+# For each "sum" operation describe above, we perform the "binary -= -binary & binary" step for all x,
+# and for each of these x, we perform "binary -= -binary & binary" step for all y, adding them all together.
+# This would give us a total of O(log(n)log(m)) runtime complexity for each operation.
