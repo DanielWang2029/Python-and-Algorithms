@@ -147,3 +147,9 @@ g = [x ** 2 for x in range(1, 11) if x % 2 == 0]
 print(g)
 h = [x ** 2 if x > 4 else x ** 3 for x in range(1, 11)]
 print(h)
+
+# double for loop list comprehensions
+# [expression for y in x for z in y] === for y in x: for z in y: expression
+# Rule of thumb: the order of fors in the comprehension is the same as the order of the nested loops
+i = [(x, y) for x in [1, 2] for y in [3, 4]]
+print(i)  # print [(1, 3), (1, 4), (2, 3), (2, 4)]
